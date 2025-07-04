@@ -21,4 +21,9 @@ const gameServer = new Server({
 gameServer.define("hero_arena", HeroArenaRoom);
 gameServer.listen(port);
 
+/* Tell PM2 we’re good to go */
+if (typeof process.send === "function") {
+  process.send("ready");
+}
+
 console.log(`✅ Listening on ws://localhost:${port}`);
