@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node build/index.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "colyseus": "^0.15.0",
