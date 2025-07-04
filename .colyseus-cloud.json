@@ -4,9 +4,9 @@
   "regions": ["us-ord"],
   "environment": {
     "NODE_ENV": "production",
-    "PORT": "2567"            // <- makes PORT always valid
+    "PORT": "2567"
   },
   "install": "npm ci --omit=dev",
-  "build":   "npm run build",
-  "start":   "node build/index.js"
+  "build": "npm run build",
+  "start": "node build/index.js"
 }
