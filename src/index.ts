@@ -1,35 +1,34 @@
 import http from "http";
-import express, { Express } from "express";
-
-import { Server } from "colyseus";
+import express from "express";
 import { WebSocketTransport } from "@colyseus/ws-transport";
-import { monitor } from "@colyseus/monitor";
-
+import { Server, matchMaker } from "@colyseus/core";
 import { HeroArenaRoom } from "./rooms/HeroArenaRoom";
 
-// ────────────────────────────────────────────────────────────
-// 1. Express app & native HTTP server
-// ────────────────────────────────────────────────────────────
-const app: Express = express();
-const port = Number(process.env.PORT) || 2567;
-
-app.get("/", (_req, res) => res.send("Colyseus server up ✅"));
-
-const httpServer = http.createServer(app);
-
-// ────────────────────────────────────────────────────────────
-// 2. Colyseus game-server on top of the HTTP server
-// ────────────────────────────────────────────────────────────
+const app = express();
+const server = http.createServer(app);
 const gameServer = new Server({
-  transport: new WebSocketTransport({ server: httpServer })
+  transport: new WebSocketTransport({ server }),
 });
 
-// register all rooms
+// ---- REGISTER ROOMS --------------------------------------------------------
 gameServer.define("hero_arena", HeroArenaRoom);
 
-// (optional) dashboard at /colyseus
-app.use("/colyseus", monitor());
+// ---- CORS HEADERS FOR MATCHMAKER ------------------------------------------
+// Docs: https://docs.colyseus.io/recipes/custom-cors-headers
+matchMaker.controller.getCorsHeaders = () => ({
+  // PlayCanvas launch domains while you test
+  "Access-Control-Allow-Origin": "https://launch.playcanvas.com",
+  // add your production web-frontends here, or just use "*"
+  // "Access-Control-Allow-Origin": "*",
+  "Vary": "Origin",
+});
 
-// ────────────────────────────────────────────────────────────
-gameServer.listen(port);
-console.log(`✅ Listening on ws://localhost:${port}`);
+// ---- START LISTENING -------------------------------------------------------
+const PORT = Number(process.env.PORT || 2567);
+gameServer
+  .listen(PORT)
+  .then(() => console.log(`✅ Colyseus listening on ws://localhost:${PORT}`))
+  .catch((err) => {
+    console.error("❌ Failed to start Colyseus:", err);
+    process.exit(1);
+  });

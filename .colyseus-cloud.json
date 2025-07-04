@@ -1,12 +1,9 @@
 {
-  "$schema": "https://schema.colyseus.cloud/colyseus-cloud-1.json",
+  "$schema": "https://docs.colyseus.io/schemas/colyseus-cloud-config-1.json",
   "name": "MOBA_game_1",
-  "regions": ["us-ord"],
-  "environment": {
-    "NODE_ENV": "production",
-    "PORT": "2567"
-  },
-  "install": "npm ci --omit=dev",
-  "build": "npm run build",
-  "start": "node build/index.js"
+  "entry": "dist/index.js",
+  "nodeVersion": "20",
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

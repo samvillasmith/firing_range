@@ -1,38 +1,41 @@
-import { Client, Room } from "colyseus";
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Room, Client } from "@colyseus/core";
+import { Schema, type } from "@colyseus/schema";
 
-/* ────────  Schema definitions ──────── */
+// ---------------------------------------------------------------------------
+// 1. State definition --------------------------------------------------------
 export class Player extends Schema {
-  @type("number") x = 0;
-  @type("number") z = 0;
+  @type("number") x: number = 0;
+  @type("number") y: number = 0;
 }
 
 export class GameState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
 }
 
-/* ────────  Room implementation ──────── */
+// ---------------------------------------------------------------------------
+// 2. Room implementation -----------------------------------------------------
 export class HeroArenaRoom extends Room<GameState> {
-
-  onCreate(/* options */): void {
+  onCreate() {
     this.setState(new GameState());
 
-    // receive movement from a client
-    this.onMessage("move", (client, { x, z }: { x: number; z: number }) => {
-      const p = this.state.players.get(client.sessionId);
-      if (p) { p.x = x; p.z = z; }
+    // messages from clients → move player
+    this.onMessage("move", (client: Client, data: { x: number; y: number }) => {
+      const player = this.state.players.get(client.sessionId);
+      if (player) {
+        player.x = data.x;
+        player.y = data.y;
+      }
     });
   }
 
-  onJoin(client: Client): void {
-    this.state.players.set(client.sessionId, new Player());
+  onJoin(client: Client) {
+    const player = new Player();
+    this.state.players.set(client.sessionId, player);
+    console.log(client.sessionId, "joined");
   }
 
-  onLeave(client: Client): void {
+  onLeave(client: Client) {
     this.state.players.delete(client.sessionId);
-  }
-
-  onDispose(): void {
-    console.log(`Room ${this.roomId} disposed`);
+    console.log(client.sessionId, "left");
   }
 }
