@@ -1,29 +1,28 @@
 import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
-import { monitor } from "@colyseus/monitor";
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { HeroArenaRoom } from "./rooms/HeroArenaRoom";
 
-const port = Number(process.env.PORT || 2567);
+const PORT = Number(process.env.PORT || 2567);
+
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/colyseus", monitor());
 
-const server = createServer(app);
+// health-check route for load-balancer
+app.get("/", (_, res) => res.sendStatus(200));
+
+const httpServer = createServer(app);
 
 const gameServer = new Server({
-  transport: new WebSocketTransport({ server }), // re-use the same HTTP server
+  transport: new WebSocketTransport({ server: httpServer }),
 });
 
 gameServer.define("hero_arena", HeroArenaRoom);
-gameServer.listen(port);
 
-/* Tell PM2 we’re good to go */
-if (typeof process.send === "function") {
-  process.send("ready");
-}
-
-console.log(`✅ Listening on ws://localhost:${port}`);
+gameServer.listen(PORT).then(() => {
+  console.log(`✅ Listening on ws://localhost:${PORT}`);
+  if (typeof process.send === "function") process.send("ready"); // PM2
+});
