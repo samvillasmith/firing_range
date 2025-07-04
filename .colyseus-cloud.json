@@ -1,4 +1,8 @@
 {
   "applicationId": "a23cf015",
-  "region": "us-ord"
+  "region": "us-ord",
+  "production": {
+    "applicationId": "1040-moba-game-1",
+    "token": "Njg2N2Q4ODRjYzA0MUphOHRIRWZFUXI5cmRndWdBMTVUbnNHbFA1bUpyUGxn"
+  }
 }
