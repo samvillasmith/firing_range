@@ -1,5 +1,6 @@
+// src/rooms/HeroArenaRoom.ts
+import { Schema, type, MapSchema } from "@colyseus/schema";   // ← MapSchema added
 import { Room, Client } from "@colyseus/core";
-import { Schema, type } from "@colyseus/schema";
 
 // ---------------------------------------------------------------------------
 // 1. State definition --------------------------------------------------------
@@ -18,19 +19,17 @@ export class HeroArenaRoom extends Room<GameState> {
   onCreate() {
     this.setState(new GameState());
 
-    // messages from clients → move player
     this.onMessage("move", (client: Client, data: { x: number; y: number }) => {
-      const player = this.state.players.get(client.sessionId);
-      if (player) {
-        player.x = data.x;
-        player.y = data.y;
+      const p = this.state.players.get(client.sessionId);
+      if (p) {
+        p.x = data.x;
+        p.y = data.y;
       }
     });
   }
 
   onJoin(client: Client) {
-    const player = new Player();
-    this.state.players.set(client.sessionId, player);
+    this.state.players.set(client.sessionId, new Player());
     console.log(client.sessionId, "joined");
   }
 
