@@ -1,43 +1,38 @@
-import { Room, Client } from "@colyseus/core";
-import { MapSchema, Schema, type } from "@colyseus/schema";
+import { Client, Room } from "colyseus";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 
-/* ──────── Schema objects ──────── */
-export class PlayerState extends Schema {
+/* ────────  Schema definitions ──────── */
+export class Player extends Schema {
   @type("number") x = 0;
-  @type("number") y = 0;
   @type("number") z = 0;
 }
 
 export class GameState extends Schema {
-  @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
+  @type({ map: Player }) players = new MapSchema<Player>();
 }
 
-/* ──────── Room ──────── */
+/* ────────  Room implementation ──────── */
 export class HeroArenaRoom extends Room<GameState> {
-  maxClients = 16;
 
-  onCreate() {
+  onCreate(/* options */): void {
     this.setState(new GameState());
+
+    // receive movement from a client
+    this.onMessage("move", (client, { x, z }: { x: number; z: number }) => {
+      const p = this.state.players.get(client.sessionId);
+      if (p) { p.x = x; p.z = z; }
+    });
   }
 
-  onJoin(client: Client) {
-    const player = new PlayerState();
-    this.state.players.set(client.sessionId, player);
+  onJoin(client: Client): void {
+    this.state.players.set(client.sessionId, new Player());
   }
 
-  onLeave(client: Client) {
+  onLeave(client: Client): void {
     this.state.players.delete(client.sessionId);
   }
 
-  // example patch handler
-  onMessage(client: Client, data: any) {
-    const p = this.state.players.get(client.sessionId);
-    if (!p) return;
-
-    if (data.move) {
-      p.x += data.move.x;
-      p.y += data.move.y;
-      p.z += data.move.z;
-    }
+  onDispose(): void {
+    console.log(`Room ${this.roomId} disposed`);
   }
 }

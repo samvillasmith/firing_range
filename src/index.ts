@@ -1,35 +1,35 @@
-import { Server } from "@colyseus/core";
+import http from "http";
+import express, { Express } from "express";
+
+import { Server } from "colyseus";
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { monitor } from "@colyseus/monitor";
-import express from "express";
-import cors from "cors";
+
 import { HeroArenaRoom } from "./rooms/HeroArenaRoom";
 
-// ─────────────────────────────────────────────────────────────
-// PORT guard – prevents NaN && matches local & cloud builds
-// ─────────────────────────────────────────────────────────────
-const ENV_PORT = process.env.PORT;
-const PORT =
-  ENV_PORT && !Number.isNaN(Number(ENV_PORT)) && Number(ENV_PORT) > 0
-    ? Number(ENV_PORT)
-    : 2567;
+// ────────────────────────────────────────────────────────────
+// 1. Express app & native HTTP server
+// ────────────────────────────────────────────────────────────
+const app: Express = express();
+const port = Number(process.env.PORT) || 2567;
 
-const app = express();
-app.use(cors());
+app.get("/", (_req, res) => res.send("Colyseus server up ✅"));
 
-const server = new Server({
-  transport: new WebSocketTransport({ server: app }),
+const httpServer = http.createServer(app);
+
+// ────────────────────────────────────────────────────────────
+// 2. Colyseus game-server on top of the HTTP server
+// ────────────────────────────────────────────────────────────
+const gameServer = new Server({
+  transport: new WebSocketTransport({ server: httpServer })
 });
 
-server.define("hero_arena", HeroArenaRoom);
+// register all rooms
+gameServer.define("hero_arena", HeroArenaRoom);
+
+// (optional) dashboard at /colyseus
 app.use("/colyseus", monitor());
 
-server
-  .listen(PORT)
-  .then(() =>
-    console.log(`✅ Listening on ws://localhost:${PORT}`))
-  .catch((err) => {
-    console.error("❌ Failed to start:", err);
-    process.exit(1);
-  });
-
+// ────────────────────────────────────────────────────────────
+gameServer.listen(port);
+console.log(`✅ Listening on ws://localhost:${port}`);
