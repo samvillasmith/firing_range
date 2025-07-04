@@ -5,22 +5,21 @@ import cors from "cors";
 import { createServer } from "http";
 import { HeroArenaRoom } from "./rooms/HeroArenaRoom";
 
-/* ------------------------------------------------------------------
-   Robust PORT parsing – handles "undefined", "", or missing variable
-------------------------------------------------------------------- */
-const rawPort = process.env.PORT ?? "";
+/* -------------------------------------------------
+ * Cloud _may_ send an **empty** PORT env variable,
+ * which becomes NaN when cast.  Guard for that.
+ * ------------------------------------------------*/
+const ENV_PORT = process.env.PORT;
 const PORT =
-  Number.isFinite(Number.parseInt(rawPort, 10)) && Number(rawPort) > 0
-    ? Number(rawPort)
-    : 2567; // fallback for local runs
-
-/* ------------------------------------------------------------------ */
+  ENV_PORT && !Number.isNaN(Number(ENV_PORT)) && Number(ENV_PORT) > 0
+    ? Number(ENV_PORT)
+    : 2567;                              // ← always falls back safely
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// health probe for the load-balancer
+// Kubernetes / LB health-check
 app.get("/", (_, res) => res.sendStatus(200));
 
 const httpServer = createServer(app);
@@ -33,5 +32,5 @@ gameServer.define("hero_arena", HeroArenaRoom);
 
 gameServer.listen(PORT).then(() => {
   console.log(`✅ Listening on ws://localhost:${PORT}`);
-  if (typeof process.send === "function") process.send("ready"); // PM2 handshake
+  if (typeof process.send === "function") process.send("ready");
 });
