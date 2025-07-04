@@ -1,18 +1,16 @@
-// ecosystem.config.js
 module.exports = {
   apps: [
     {
-      name: "hero-arena",          // give it a stable name
+      name: "hero-arena",
       script: "./build/index.js",
       exec_mode: "fork",
-      instances: 1,                // single process
-      watch: false,                // don’t auto-reload on file changes
+      instances: 1,
 
-      /** Graceful rolling deploy */
-      wait_ready: true,            // new proc waits for “ready”
-      listen_timeout: 5000,        // PM2 kills it if not ready in 5 s
-      kill_timeout: 5000,          // time to let the old proc die
-      shutdown_with_message: true, // send “shutdown” msg for cleanup
+      /** graceful rolling deploy */
+      wait_ready: true,
+      listen_timeout: 8000,
+      kill_timeout: 8000,
+      shutdown_with_message: true,
     },
   ],
 };
