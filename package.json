@@ -1,7 +1,7 @@
 {
   "name": "hero-arena-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Colyseus 0.16 demo server for Hero Arena",
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",

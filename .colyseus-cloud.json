@@ -1,8 +1,12 @@
 {
-  "applicationId": "a23cf015",
-  "region": "us-ord",
-  "production": {
-    "applicationId": "1040-moba-game-1",
-    "token": "Njg2N2Q4ODRjYzA0MUphOHRIRWZFUXI5cmRndWdBMTVUbnNHbFA1bUpyUGxn"
-  }
+  "$schema": "https://schema.colyseus.cloud/colyseus-cloud-1.json",
+  "name": "MOBA_game_1",
+  "regions": ["us-ord"],
+  "environment": {
+    "NODE_ENV": "production",
+    "PORT": "2567"            // <- makes PORT always valid
+  },
+  "install": "npm ci --omit=dev",
+  "build":   "npm run build",
+  "start":   "node build/index.js"
 }

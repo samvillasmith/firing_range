@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
-    "module": "commonjs",
-    "lib": ["es2020"],
-    "target": "es2020",
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "build",
+    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "skipLibCheck": true
   },
-  // tsconfig.json – tweak include
-"include": ["./*.ts", "src/**/*"],  // :contentReference[oaicite:5]{index=5,,
- "exclude": ["node_modules"]
+  "include": ["src"]
 }
