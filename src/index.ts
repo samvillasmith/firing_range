@@ -1,19 +1,26 @@
-import { listen } from "@colyseus/arena";
+import { Server } from "colyseus";
+import { createServer } from "http";
 import { monitor } from "@colyseus/monitor";
+import express from "express";
+import cors from "cors";
 import { HeroArenaRoom } from "./rooms/HeroArenaRoom";
 
-export default listen({
-    getId: () => "Hero Arena",
-    
-    initializeGameServer: (gameServer) => {
-        gameServer.define('hero_arena', HeroArenaRoom);
-    },
+const port = Number(process.env.PORT || 2567);
+const app = express();
 
-    initializeExpress: (app) => {
-        app.use("/colyseus", monitor());
-    },
+app.use(cors());
+app.use(express.json());
 
-    beforeListen: () => {
-        console.log("Server is starting...");
-    }
+// Colyseus monitor
+app.use("/colyseus", monitor());
+
+const server = createServer(app);
+const gameServer = new Server({
+  server,
 });
+
+// Register room
+gameServer.define("hero_arena", HeroArenaRoom);
+
+gameServer.listen(port);
+console.log(`✅ Listening on ws://localhost:${port}`);

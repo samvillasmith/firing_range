@@ -2,10 +2,14 @@
   "compilerOptions": {
     "outDir": "./build",
     "module": "commonjs",
-    "target": "es2016",
+    "lib": ["es2020"],
+    "target": "es2020",
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
