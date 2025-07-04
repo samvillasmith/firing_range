@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  // tsconfig.json – tweak include
+"include": ["./*.ts", "src/**/*"],  // :contentReference[oaicite:5]{index=5,,
+ "exclude": ["node_modules"]
 }
